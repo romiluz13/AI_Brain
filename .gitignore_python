@@ -1,0 +1,110 @@
+# Python specific gitignore for AI Brain Python project
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# AI Brain Python specific
+# Configuration files with secrets
+config/local.yaml
+config/production.yaml
+.env.local
+.env.production
+
+# MongoDB data
+data/mongodb/
+*.db
+
+# Redis data
+data/redis/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Performance test results
+performance_results/
+benchmarks/
+
+# Model files (if storing locally)
+models/
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Vector embeddings cache
+embeddings_cache/
+vector_cache/

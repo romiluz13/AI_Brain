@@ -1,0 +1,54 @@
+# Development Dockerfile for AI Brain Python
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    POETRY_VERSION=1.7.1 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=false
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    gcc \
+    g++ \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install poetry==$POETRY_VERSION
+
+# Set work directory
+WORKDIR /workspace
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure poetry and install dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --with dev --no-root \
+    && rm -rf $POETRY_CACHE_DIR
+
+# Copy project files
+COPY . .
+
+# Install the project in development mode
+RUN poetry install --with dev
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash ai_brain \
+    && chown -R ai_brain:ai_brain /workspace
+USER ai_brain
+
+# Expose ports for development servers
+EXPOSE 8000 8080
+
+# Default command
+CMD ["bash"]
