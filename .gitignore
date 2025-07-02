@@ -1,0 +1,209 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache directories
+.turbo/
+.cache/
+.parcel-cache/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development tools
+.roomodes
+.roo/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# AI Brain Python specific
+*validation_results*.json
+*validation*.log
+test_results/
+.env.example
+.env.local
+.env.development
+.env.production
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# ============================================================================
+# CLEAN BACKUP EXCLUSIONS - Remove internal files for GitHub backup
+# ============================================================================
+
+# JavaScript comparison directory (internal reference only)
+ai_brain_js-compare_to_python/
+
+# Test files and test data
+*test*.py
+test_*.py
+*_test.py
+run_tests.py
+validate_implementation.py
+setup_test_environment.py
+demo_*.py
+ultimate_*.py
+tests/
+test_storage/
+run_comprehensive_validation.py
+upload_to_mongodb.py
+
+# Test data files (keep package.json files)
+*.json
+!package*.json
+!pyproject.toml
+
+# Specific files to exclude
+hybrid_search_docs
+
+# Development and deployment files
+docker-compose.yml
+Dockerfile*
+.dockerignore
+Makefile
+pytest.ini
+requirements-dev.txt
+requirements-test.txt
+
+# Configuration and scripts
+config/
+scripts/
+
+# Work-in-progress documentation
+docs/js_*.md
+docs/cognitive_systems/
+hybrid_search_docs/
+
+# Node.js files (not needed for Python package)
+package-lock.json

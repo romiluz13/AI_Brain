@@ -1,0 +1,196 @@
+name: Python AI Brain CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: 
+      - 'ai_brain_python/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/python-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'ai_brain_python/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/python-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    - name: Install project
+      run: poetry install --no-interaction
+
+    - name: Run code quality checks
+      run: |
+        poetry run black --check ai_brain_python/
+        poetry run isort --check-only ai_brain_python/
+        poetry run flake8 ai_brain_python/
+        poetry run mypy ai_brain_python/
+
+    - name: Run security checks
+      run: |
+        poetry run bandit -r ai_brain_python/ -f json -o bandit-report.json || true
+
+    - name: Run unit tests
+      env:
+        MONGODB_URL: mongodb://root:password@localhost:27017/test_db?authSource=admin
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        poetry run pytest tests/unit/ -v --cov=ai_brain_python --cov-report=xml --cov-report=html
+
+    - name: Run integration tests
+      env:
+        MONGODB_URL: mongodb://root:password@localhost:27017/test_db?authSource=admin
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        poetry run pytest tests/integration/ -v
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          htmlcov/
+          bandit-report.json
+          .coverage
+
+  framework-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        framework: ["crewai", "pydantic_ai", "agno", "langchain", "langgraph"]
+        python-version: ["3.11"]
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+
+    - name: Run framework-specific tests
+      env:
+        MONGODB_URL: mongodb://root:password@localhost:27017/test_db?authSource=admin
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        poetry run pytest tests/ -m ${{ matrix.framework }} -v
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+
+    - name: Run performance tests
+      env:
+        MONGODB_URL: mongodb://root:password@localhost:27017/test_db?authSource=admin
+      run: |
+        poetry run pytest tests/performance/ -v --benchmark-only
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: performance_results/
